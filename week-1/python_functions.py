@@ -45,4 +45,12 @@ def hello(**kwargs):
 
 hello(name = 'John', age = 30)
 
-  
+
+# Class work
+
+fruits = ['apple', 'banana', 'orange', 'grape', 'mango', 'pineapple', 'strawberry', 'watermelon']
+fruits[1,5]
+
+import array
+
+myfruits = array.array
