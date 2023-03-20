@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Sentiment Analysis</title>
+    <style>
+        /* Set the background color */
+        body {
+            background-color: #03082f;
+            color: #FFFFFF;
+        }
+
+        /* Set the title style */
+        h1 {
+            text-align: center;
+            margin-top: 150px;
+            font-size: 48px;
+            color: #1DA1F2;
+        }
+
+        /* Set the form style */
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 50px;
+            background-color: #1C1E22;
+            border-radius: 7px;
+            box-shadow: 20px 20px 60px #121416, -20px -20px 60px #2D3035;
+            padding: 50px;
+            width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Set the input style */
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: none;
+            background-color: #1C1E22;
+            border-radius: 4px;
+            box-shadow: inset 10px 10px 20px #121416, inset -10px -10px 20px #2D3035;
+            font-size: 18px;
+            color: #FFFFFF;
+        }
+
+        /* Set the button style */
+        button[type="submit"] {
+            background-color: #1DA1F2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 4px;
+            font-size: 18px;
+            box-shadow: 10px 10px 20px #121416, -10px -10px 20px #2D3035;
+            cursor: pointer;
+        }
+
+        /* Set the result style */
+        p {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 36px;
+            color: #1DA1F2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Twitter Sentiment Analysis</h1>
+    <form method="post">
+        <input type="text" name="tweet" placeholder="Enter a tweet...">
+        <button type="submit">Analyze</button>
+    </form>
+    {% if sentiment %}
+        <p>The sentiment is {{ sentiment }}</p>
+    {% endif %}
+</body>
+</html>
