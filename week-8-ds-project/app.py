@@ -1,143 +1,153 @@
-# from flask import Flask, request, render_template
-# from tensorflow.keras.models import load_model
-# from tensorflow.keras.preprocessing import image
-# import numpy as np
-# import io
-
-# app = Flask(__name__)
-
-# model = load_model('animal_detection_model.h5')
-# model.make_predict_function()
-
-# @app.route('/', methods=['GET', 'POST'])
-# def index():
-#     if request.method == 'POST':
-#         img = request.files['image']
-#         img = io.BytesIO(img.read())
-#         img = image.load_img(img, target_size=(224, 224))
-#         img = image.img_to_array(img)
-#         img = np.expand_dims(img, axis=0)
-#         img = img/255
-
-#         prediction = model.predict(img)
-#         predicted_class = np.argmax(prediction[0])
-#         class_names = ['Bear', 'Brown Bear', 'Bull', 'Butterfly', 'Camel', 'Canary', 'Cat', 'Cattle', 'Centipede', 'Cheetah', 'Chicken', 'Crab', 'Crocodile', 'Dog', 'Duck', 'Leopard', 'Lion', 'Polar Bear', 'Tiger', 'Zebra'] # update this with your class names
-#         predicted_class_name = class_names[predicted_class]
-
-#         return render_template('index.html', prediction=predicted_class_name)
-#     return render_template('index.html')
-
-# if __name__ == '__main__':
-#     app.run()
-
-
-
-
-# from flask import Flask, render_template, request
-# from tensorflow.keras.models import load_model
-# from tensorflow.keras.preprocessing import image
-# import numpy as np
-
-# # Initialize Flask app
-# app = Flask(__name__)
-
-# # Load the trained model
-# model = load_model('./animal_detection_model.h5')
-
-# # Define a list of class labels (replace with your own class labels)
-# class_labels = ['class1', 'class2', 'class3', 'class4']
-
-# # Define a function to preprocess the image
-# def preprocess_image(img_path):
-#     img = image.load_img(img_path, target_size=(224, 224))
-#     x = image.img_to_array(img)
-#     x = np.expand_dims(x, axis=0)
-#     x = x / 255.0  # normalize pixel values to [0, 1]
-#     return x
-
-# # Define a function to predict the class label
-# def predict_class(img_path):
-#     x = preprocess_image(img_path)
-#     preds = model.predict(x)
-#     predicted_class_idx = np.argmax(preds[0])
-#     predicted_class = class_labels[predicted_class_idx]
-#     return predicted_class
-
-# # Define the route for the home page
-# @app.route('/')
-# def home():
-#     return render_template('index.html')
-
-# # Define the route for image upload
-# @app.route('/upload', methods=['POST'])
-# def upload():
-#     # Get the uploaded file from the request
-#     file = request.files['image']
-
-#     # Save the uploaded file to a temporary location
-#     file_path = 'tmp/' + file.filename
-#     file.save(file_path)
-
-#     # Call the predict_class function to get the predicted class label
-#     predicted_class = predict_class(file_path)
-
-#     # Return the predicted class label to the user
-#     return f'Predicted Class: {predicted_class}'
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
-
-
-import numpy as np
 import os
+from flask import Flask, request, jsonify, render_template, send_from_directory
+from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
-import tensorflow as tf
-
-from flask import Flask , request, render_template
-# secure_filename will ensure the images uploaded will get saved in the uploads folder
-# from werkzeug.utils import secure_filename
-# from gevent.pywsgi import WSGIServer
+from tensorflow.keras.preprocessing.image import load_img, img_to_array
+import numpy as np
 
 app = Flask(__name__)
-model = load_model("./animal_detection_model.h5")
+
+# Define the upload folder and allowed file types
+UPLOAD_FOLDER = './tmp'
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
+
+# Load the trained model
+model = load_model('animal_detection_model.h5')
+
+# Define a dictionary that maps class indices to class names
+class_dict = {
+    0: 'Bear',
+    1: 'Brown bear',
+    2: 'Bull',
+    3: 'Butterfly',
+    4: 'Camel',
+    5: 'Canary',
+    6: 'Caterpillar',
+    7: 'Cattle',
+    8: 'Centipede',
+    9: 'Cheetah',
+    10: 'Chicken',
+    11: 'Crab',
+    12: 'Crocodile',
+    13: 'Deer',
+    14: 'Duck',
+    15: 'Eagle',
+    16: 'Elephant',
+    17: 'Fish',
+    18: 'Fox',
+    19: 'Frog',
+    20: 'Giraffe',
+    21: 'Goat',
+    22: 'Goldfish',
+    23: 'Goose',
+    24: 'Hamster',
+    25: 'Harbor seal',
+    26: 'Hedgehog',
+    27: 'Hippopotamus',
+    28: 'Horse',
+    29: 'Jaguar',
+    30: 'Jellyfish',
+    31: 'Kangaroo',
+    32: 'Koala',
+    33: 'Ladybug',
+    34: 'Leopard',
+    35: 'Lion',
+    36: 'Lizard',
+    37: 'Lynx',
+    38: 'Magpie',
+    39: 'Monkey',
+    40: 'Moths and butterflies',
+    41: 'Mouse',
+    42: 'Mule',
+    43: 'Ostrich',
+    44: 'Otter',
+    45: 'Owl',
+    46: 'Panda',
+    47: 'Parrot',
+    48: 'Penguin',
+    49: 'Pig',
+    50: 'Polar bear',
+    51: 'Rabbit',
+    52: 'Raccoon',
+    53: 'Raven',
+    54: 'Red panda',
+    55: 'Rhinoceros',
+    56: 'Scorpion',
+    57: 'Sea lion',
+    58: 'Sea turtle',
+    59: 'Seahorse',
+    60: 'Shark',
+    61: 'Sheep',
+    62: 'Shrimp',
+    63: 'Snail',
+    64: 'Snake',
+    65: 'Sparrow',
+    66: 'Spider',
+    67: 'Squid',
+    68: 'Squirrel',
+    69: 'Starfish',
+    70: 'Swan',
+    71: 'Tick',
+    72: 'Tiger',
+    73: 'Tortoise',
+    74: 'Turkey',
+    75: 'Turtle',
+    76: 'Whale',
+    77: 'Woodpecker',
+    78: 'Worm',
+    79: 'Zebra'
+}
+
+
+# Define a function to check if a file has an allowed extension
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/predict',methods = ['GET','POST'])
-def predict():
-    if request.method == 'POST':
-        f = request.files['image']
-        print("current path")
-        # This extracts the filepath of the image uploaded
-        basepath = os.path.dirname(__file__)
-        print("current path", basepath)
-        # This appends the original filepath to that of uploads
-        filepath = os.path.join(basepath,'tmp',f.filename)
-        print("upload folder is ", filepath)
-        # This saves the filepath of the image
-        f.save(filepath)
-        
-        file = "/tmp/" + f.filename
-        
-        # Testing the model
-        img = image.load_img(filepath,target_size = (64,64))
-        x = image.img_to_array(img)
-        x = np.expand_dims(x,axis =0)
-        preds = model.predict(x)
-        
-        print("prediction",preds)
-            
-        index = ['bear','crow','elephant','racoon','rat']
-        
-        print(np.argmax(preds))
-        
-        result = "The predicted animal is: " + str(index[np.argmax(preds)])
-        
-        return render_template("index.html", result=result, uploaded_image=file)
+# Define a route to handle file uploads
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    # Check if a file was uploaded
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file uploaded'})
+    
+    file = request.files['file']
+    
+    # Check if the file has an allowed extension
+    if not allowed_file(file.filename):
+        return jsonify({'error': 'Invalid file type'})
+    
+    # Save the file to the upload folder
+    filename = secure_filename(file.filename)
+    file.save(os.path.join(UPLOAD_FOLDER, filename))
+    
+    # Load the image and preprocess it
+    img = load_img(os.path.join(UPLOAD_FOLDER, filename), target_size=(224, 224))
+    img_array = img_to_array(img)
+    img_array = np.expand_dims(img_array, axis=0)
+    img_array /= 255.
+    
+    # Make a prediction using the model
+    prediction = model.predict(img_array)
+    predicted_class_index = np.argmax(prediction)
+    
+    # Look up the predicted class name in the class dictionary
+    predicted_class_name = class_dict[predicted_class_index]
+    
+    # # Return the predicted class name
+    # return jsonify({'class': predicted_class_name})
+
+    # Return the predicted class name and the image file path
+    return render_template('index.html', predicted_class_name=predicted_class_name, image_file_path=f'/uploads/{filename}')
+
+# Add a new route to serve the uploaded images
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 if __name__ == '__main__':
-    app.run(debug = True, threaded = False)
+    app.run()

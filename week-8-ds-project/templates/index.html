@@ -1,57 +1,74 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Animal Detection</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 0;
-                padding: 0;
-            }
-            .container {
-                max-width: 800px;
-                margin: 0 auto;
-                padding: 40px 0;
-            }
-            h1 {
-                color: #4CAF50;
-                text-align: center;
-            }
-            form {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-            input[type="file"] {
-                margin-bottom: 20px;
-            }
-            input[type="submit"] {
-                background-color: #4CAF50;
-                color: white;
-                padding: 12px 20px;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-            }
-            input[type="submit"]:hover {
-                background-color: #45a049;
-            }
-            h2 {
-                color: #4CAF50;
-                text-align: center;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>Animal Detection</h1>
-            <form action="/predict" method="post" enctype="multipart/form-data">
-                <input type="file" name="image">
-                <input type="submit" value="Predict">
-            </form>
-            {% if prediction %}
-                <h2>Prediction: {{ prediction }}</h2>
-            {% endif %}
+<head>
+	<title>Animal Detection</title>
+	<style>
+		body {
+			background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba');
+			background-size: cover;
+			background-position: center;
+			font-family: Arial, sans-serif;
+			color: #fff;
+			text-align: center;
+		}
+		h1 {
+			margin-top: 50px;
+			font-size: 48px;
+			font-weight: bold;
+			text-shadow: 2px 2px #000;
+		}
+		form {
+			margin-top: 50px;
+			display: inline-block;
+			background-color: rgba(255, 255, 255, 0.8);
+			padding: 20px;
+			border-radius: 10px;
+			box-shadow: 2px 2px 10px #000;
+		}
+		input[type="file"] {
+			display: block;
+			margin: 20px auto;
+			font-size: 18px;
+			padding: 10px;
+			border-radius: 5px;
+			border: none;
+			background-color: #eee;
+			color: #333;
+			box-shadow: 2px 2px 5px #000;
+		}
+		button[type="submit"] {
+			display: block;
+			margin: 20px auto;
+			font-size: 24px;
+			padding: 10px 20px;
+			border-radius: 5px;
+			border: none;
+			background-color: #4CAF50;
+			color: #fff;
+			box-shadow: 2px 2px 5px #000;
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+	<h1>Animal Prediction</h1>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+        <div>
+          <label for="file-upload">Upload an image:</label>
+          <input type="file" id="file-upload" name="file" accept="image/*" required>
         </div>
-    </body>
+        <div>
+          <button type="submit">Predict</button>
+        </div>
+      </form>
+
+      {% if image_file_path %}
+        <div>
+          <img src="{{ image_file_path }}" alt="Uploaded image">
+        </div>
+        <div>
+          <h2>Predicted Animal: {{ predicted_class_name }}</h2>
+        </div>
+      {% endif %}
+</body>
 </html>
