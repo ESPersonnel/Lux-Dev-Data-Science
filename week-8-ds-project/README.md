@@ -9,7 +9,7 @@ In this project, I created a deep learning model for animal detection and deploy
 
 ### Dataset
 
-The dataset used in this project is available on ![Kaggle](https://www.kaggle.com/datasets/antoreepjana/animals-detection-images-dataset). It contains images of various animals (80 animals, excluding the infamous dogs and cats), divided into training and testing sets. The dataset is preprocessed using the ImageDataGenerator class from TensorFlow, which rescales the images, applies data augmentation techniques, and generates batches of images for training and validation.
+The dataset used in this project is available on [Kaggle](https://www.kaggle.com/datasets/antoreepjana/animals-detection-images-dataset). It contains images of various animals (80 animals, excluding the infamous dogs and cats), divided into training and testing sets. The dataset is preprocessed using the ImageDataGenerator class from TensorFlow, which rescales the images, applies data augmentation techniques, and generates batches of images for training and validation.
 
 
 ### Model
@@ -54,3 +54,6 @@ This will start the Flask development server, and the application will be access
 This project demonstrates how to create a deep learning model for animal detection and deploy it as a web application using Flask. The model is trained on a dataset of animal images and can classify images into different animal categories. Users can upload images through the web application and receive predictions on the animal class.
 
 
+### LICENCE
+
+[MIT Licence](./LICENCE)
